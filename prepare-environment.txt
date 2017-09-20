@@ -1,1 +1,14 @@
 This file details the preparation steps to start the Python training.
+
+Install Python.
+Make sure you have "pip" package manager.
+
+Install Jupyter with:
+pip install jupyter
+
+Start Notebooks with:
+jupyter notebook
+
+Click any notebook and start pressing "Play" button on each cell, or shift-enter.
+
+IF you feel adventurous, use Jupyter Lab.
