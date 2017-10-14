@@ -1,5 +1,3 @@
-# python-training
-Self-paced Python training tutorials, beginner and advanced.
+# python-training / Lesson 03 - HTTP client
 
-To get started, check contents of file: prepare-environment.txt and follow the instructions.
-There are sections for both Windows and Linux.
+This tutorial will show you how to send HTTP messages, retrieve responses and use this data in a console application.
