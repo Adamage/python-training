@@ -1,32 +1,47 @@
-from model.Lesson import Lesson
+from model.Meeting import Meeting
+from datetime import datetime
 
 
 class DbInMemory:
     def __init__(self):
-        self.lessons = []
+        self.meetings = []
 
-    def add_lesson(self, title):
-        new_lesson = Lesson(title=title)
-        self.lessons.append(new_lesson)
-        index = self.lessons.index(new_lesson)
-        return new_lesson.serialize(), index
+    def add_meeting(self, title, date):
+        uid = len(self.meetings) + 1
+        new_lesson = Meeting(title, date, uid)
+        self.meetings.append(new_lesson)
 
-    def get_lesson_by_index(self, index):
-        try:
-            return self.lessons[index].serialize()
-        except KeyError:
-            return None
+        return new_lesson.serialize()
 
-    def get_lesson_by_title(self, title):
-        try:
-            lesson = [x for x in self.lessons if x.title == str(title)]
-            return lesson[0].serialize()
-        except IndexError:
-            return None
+    def update_meeting(self, meeting_to_update):
+        existing_meeting = None
+        for meeting in self.meetings:
+            if meeting.uid == meeting_to_update.uid:
+                existing_meeting = meeting
 
-    def get_all_lessons(self):
-        return [x.serialize() for x in self.lessons]
+        if existing_meeting:
+            self.meetings.remove(existing_meeting)
+            self.meetings.append(meeting_to_update)
+            return meeting_to_update.serialize()
+        else:
+            return self.add_meeting(meeting_to_update.title, meeting_to_update.date)
+
+    def delete_meeting(self, uid):
+        for meeting in self.meetings:
+            if meeting.uid == uid:
+                self.meetings.remove(meeting)
+                return meeting.serialize()
+
+    def get_meeting_by_uid(self, uid):
+        for meeting in self.meetings:
+            if meeting.uid == uid:
+                return meeting.serialize()
+
+        return None
+
+    def get_all_meetings(self):
+        return [meeting.serialize() for meeting in self.meetings]
 
     def fill_with_examples(self):
-        for title in ["a", "b", "c"]:
-            self.add_lesson(Lesson(title))
+        self.meetings.append(Meeting("Somename1", datetime.now(), 38780))
+        self.meetings.append(Meeting("Somename2", datetime.now(), 80))

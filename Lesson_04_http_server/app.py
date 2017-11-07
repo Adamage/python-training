@@ -1,5 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from database.DbInMemory import DbInMemory
+from model.Meeting import Meeting
+import json
+
+from model.tools import deserialize_meeting
 
 app = Flask(__name__)
 db = DbInMemory()
@@ -8,37 +12,44 @@ db.fill_with_examples()
 
 @app.route('/')
 def index():
-    return "python-training lesson index - welcome!<br><br>" \
-           "API description:<br>" \
-           "- GET /api/lessons - shows all lessons<br>" \
-            "- GET /api/lessons/title/<str:title> - finds lesson by title<br>" \
-            "- PUT /api/lessons/title/<str:title> - creates lesson with title<br>" \
-            "- GET /api/lessons/index/<int:index> - finds lesson with index"
+    return "python-training lesson index - welcome! <br><br>" \
+           "API description :<br>" \
+           "- GET /api/meetings - shows all meetings <br>" \
+            "- GET /api/meeting/<int:uid> - finds lesson by uid <br>" \
+            "- PUT /api/meeting/title/<str:title> - creates lesson with title<br>" \
+            "- GET /api/meeting/index/<int:index> - finds lesson with index"
 
 
-@app.route('/api/lessons', methods=['GET'])
-def get_lessons():
-    return jsonify({'lessons': db.get_all_lessons()})
+@app.route('/api/meetings', methods=['GET'])
+def get_meetings():
+    return jsonify({'meetings': db.get_all_meetings()})
 
 
-@app.route('/api/lessons/title/<string:title>', methods=['GET'])
-def get_lesson_by_title(title):
-    return jsonify({'lesson': db.get_lesson_by_title(title)})
+@app.route('/api/meeting/<int:uid>', methods=['GET'])
+def get_meeting_by_uid(uid):
+    return jsonify({'meeting': db.get_meeting_by_uid(uid)})
 
 
-@app.route('/api/lessons/title/<string:title>', methods=['PUT'])
-def update_lesson(title):
-    existing_lesson = db.get_lesson_by_title(title)
-    if existing_lesson:
-        return "Lesson already exists: " + jsonify({'lesson': existing_lesson})
-    else:
-        new_lesson, index = db.add_lesson(title)
-        return "Created new lesson with index {0} : {1} ".format(index, jsonify({'lesson': new_lesson}))
+@app.route('/api/meeting', methods=['POST'])
+def add_meeting():
+    request_content = request.data
+    recreated_dictionary = json.loads(request_content)
+    meeting = deserialize_meeting(recreated_dictionary)
+    return jsonify({'meeting_created': db.add_meeting(meeting.title, meeting.date)})
 
 
-@app.route('/api/lessons/index/<int:index>', methods=['GET'])
-def get_lesson_by_index(index):
-    return jsonify({'lesson': db.get_lesson_by_index(index)})
+@app.route('/api/meeting/<int:uid>', methods=['PUT'])
+def update_meeting(uid):
+    request_content = request.data
+    recreated_dictionary = json.loads(request_content)
+    meeting = deserialize_meeting(recreated_dictionary, uid=uid)
+    return jsonify({'meeting_updated': db.update_meeting(meeting)})
+
+
+@app.route('/api/meeting/<int:uid>', methods=['DELETE'])
+def delete_meeting(uid):
+    return jsonify({'meeting_deleted': db.delete_meeting(uid)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
