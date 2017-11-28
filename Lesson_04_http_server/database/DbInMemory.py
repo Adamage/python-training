@@ -8,10 +8,10 @@ class DbInMemory:
 
     def add_meeting(self, title, date):
         uid = len(self.meetings) + 1
-        new_lesson = Meeting(title, date, uid)
-        self.meetings.append(new_lesson)
+        new_meeting = Meeting(title, date, uid)
+        self.meetings.append(new_meeting)
 
-        return new_lesson.serialize()
+        return new_meeting.serialize()
 
     def update_meeting(self, meeting_to_update):
         existing_meeting = None
@@ -28,7 +28,7 @@ class DbInMemory:
 
     def delete_meeting(self, uid):
         for meeting in self.meetings:
-            if meeting.uid == uid:
+            if meeting.uid == int(uid):
                 self.meetings.remove(meeting)
                 return meeting.serialize()
 
@@ -40,6 +40,11 @@ class DbInMemory:
         return None
 
     def get_all_meetings(self):
+        # serialized_meetings = []
+        # for meeting in self.meetings:
+        #     serialized = meeting.serialize()
+        #     serialized_meetings.append(serialized)
+        # return serialized_meetings
         return [meeting.serialize() for meeting in self.meetings]
 
     def fill_with_examples(self):
